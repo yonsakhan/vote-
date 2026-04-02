@@ -1,0 +1,14 @@
+node_modules
+build
+dist
+.next
+out
+coverage
+.env*
+.git
+.trae
+.log
+.figma
+*.log
+*.tsbuildinfo
+pencil-new.pen

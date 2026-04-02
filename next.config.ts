@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Vercel 自动处理，不需要特殊配置
 };
 
 export default nextConfig;
