@@ -109,6 +109,7 @@ export default function VotePage() {
   }
 
   const isExpired = poll.deadline && new Date(poll.deadline) < new Date();
+  const hasOptions = poll.options.length > 0;
 
   if (voted || isExpired) {
     return <ResultView poll={poll} isExpired={!!isExpired} id={id} />;
@@ -157,34 +158,40 @@ export default function VotePage() {
           </div>
 
           <div className="space-y-3 mb-6">
-            {poll.options.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => toggleOption(option.id)}
-                className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                  selected.includes(option.id)
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-slate-200 hover:border-blue-300 bg-slate-50'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                      selected.includes(option.id)
-                        ? 'border-blue-500 bg-blue-500'
-                        : 'border-slate-300 bg-white'
-                    }`}
-                  >
-                    {selected.includes(option.id) && (
-                      <span className="text-white text-xs">✓</span>
-                    )}
+            {hasOptions ? (
+              poll.options.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => toggleOption(option.id)}
+                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                    selected.includes(option.id)
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-slate-200 hover:border-blue-300 bg-slate-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                        selected.includes(option.id)
+                          ? 'border-blue-500 bg-blue-500'
+                          : 'border-slate-300 bg-white'
+                      }`}
+                    >
+                      {selected.includes(option.id) && (
+                        <span className="text-white text-xs">✓</span>
+                      )}
+                    </div>
+                    <span className={selected.includes(option.id) ? 'text-blue-700 font-medium' : 'text-slate-700'}>
+                      {option.text}
+                    </span>
                   </div>
-                  <span className={selected.includes(option.id) ? 'text-blue-700 font-medium' : 'text-slate-700'}>
-                    {option.text}
-                  </span>
-                </div>
-              </button>
-            ))}
+                </button>
+              ))
+            ) : (
+              <div className="p-4 rounded-xl bg-amber-50 text-amber-700 text-sm">
+                该投票数据不完整，暂时无法参与投票，请稍后刷新或重新创建。
+              </div>
+            )}
           </div>
 
           {error && (
@@ -193,7 +200,7 @@ export default function VotePage() {
 
           <button
             onClick={handleVote}
-            disabled={submitting || selected.length === 0}
+            disabled={submitting || selected.length === 0 || !hasOptions}
             className="w-full py-4 rounded-xl btn-primary text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? (

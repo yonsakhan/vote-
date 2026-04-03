@@ -26,6 +26,7 @@ type PollOptionRow = {
   id: string;
   text: string;
   votes: number;
+  created_at: string;
 };
 
 export async function GET(request: Request) {
@@ -220,16 +221,18 @@ export async function POST(request: Request) {
       .single();
 
     if (createError || !created) {
+      console.error('create poll failed', createError);
       return NextResponse.json({ error: '创建投票失败' }, { status: 500 });
     }
 
     const { data: createdOptions, error: optError } = await supabase
       .from('poll_options')
       .insert(optionList.map((text) => ({ poll_id: created.id, text })))
-      .select('id,text,votes')
-      .order('created_at', { ascending: true });
+      .select('id,text,votes,created_at');
 
-    if (optError) {
+    if (optError || !createdOptions || createdOptions.length !== optionList.length) {
+      console.error('create poll options failed', optError);
+      await supabase.from('polls').delete().eq('id', created.id);
       return NextResponse.json({ error: '创建投票失败' }, { status: 500 });
     }
 
@@ -237,7 +240,10 @@ export async function POST(request: Request) {
       id: created.id,
       title: created.title,
       description: created.description ?? '',
-      options: ((createdOptions as unknown as PollOptionRow[]) || []).map((o) => ({ id: o.id, text: o.text, votes: Number(o.votes || 0) })),
+      options: ((createdOptions as unknown as PollOptionRow[]) || [])
+        .slice()
+        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+        .map((o) => ({ id: o.id, text: o.text, votes: Number(o.votes || 0) })),
       multiSelect: Boolean(created.multi_select),
       deadline: created.deadline,
       createdAt: created.created_at,
@@ -245,7 +251,8 @@ export async function POST(request: Request) {
     };
 
     return NextResponse.json({ poll }, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error('create poll request failed', error);
     return NextResponse.json(
       { error: '创建投票失败' },
       { status: 500 }
