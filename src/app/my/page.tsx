@@ -93,21 +93,21 @@ export default function MyPollsPage() {
       <div className="card p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">我的投票</h1>
-            <div className="text-sm text-slate-500 mt-1">本地记录你创建过的投票</div>
+            <h1 className="type-page font-bold text-heading">我的投票</h1>
+            <div className="type-body text-secondary mt-1">本地记录你创建过的投票</div>
           </div>
           <Link href="/create" className="btn-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center">
             + 创建投票
           </Link>
         </div>
 
-        <div className="mt-5 flex gap-3">
+        <div className="mt-5 flex flex-wrap gap-3">
           <button
             onClick={() => setTab('created')}
             className={`px-4 py-2.5 rounded-xl text-sm font-semibold border transition-colors ${
               tab === 'created'
-                ? 'bg-blue-50 text-blue-700 border-blue-100'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                ? 'surface-chip text-accent'
+                : 'action-outline'
             }`}
           >
             我创建的
@@ -116,8 +116,8 @@ export default function MyPollsPage() {
             onClick={() => setTab('voted')}
             className={`px-4 py-2.5 rounded-xl text-sm font-semibold border transition-colors ${
               tab === 'voted'
-                ? 'bg-blue-50 text-blue-700 border-blue-100'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                ? 'surface-chip text-accent'
+                : 'action-outline'
             }`}
           >
             我参与的
@@ -127,33 +127,33 @@ export default function MyPollsPage() {
 
       {!authChecked ? (
         <div className="flex items-center justify-center py-24">
-          <div className="w-12 h-12 rounded-full border-2 border-blue-100 border-t-blue-600 animate-spin" />
+          <div className="loader-ring" />
         </div>
       ) : !userId ? (
         <div className="card p-12 text-center">
           <div className="text-6xl mb-4 opacity-30">🔐</div>
-          <div className="text-slate-700 font-semibold mb-2">登录后查看</div>
-          <div className="text-slate-500 text-sm mb-6">“我创建的 / 我参与的”需要登录后才能展示</div>
+          <h2 className="text-heading font-semibold mb-2">登录后查看</h2>
+          <div className="type-body text-secondary mb-6">“我创建的 / 我参与的”需要登录后才能展示</div>
           <Link href="/login?next=%2Fmy" className="inline-block btn-primary px-8 py-3 rounded-xl text-white font-semibold">
             去登录
           </Link>
         </div>
       ) : loading ? (
         <div className="flex items-center justify-center py-24">
-          <div className="w-12 h-12 rounded-full border-2 border-blue-100 border-t-blue-600 animate-spin" />
+          <div className="loader-ring" />
         </div>
       ) : error ? (
         <div className="card p-8 text-center">
-          <div className="text-slate-800 font-semibold mb-2">加载失败</div>
-          <div className="text-slate-500 text-sm">{error}</div>
+          <div className="text-heading font-semibold mb-2">加载失败</div>
+          <div className="type-body text-secondary">{error}</div>
         </div>
       ) : polls.length === 0 ? (
         <div className="card p-12 text-center">
           <div className="text-6xl mb-4 opacity-30">📭</div>
-          <div className="text-slate-700 font-semibold mb-2">
+          <div className="text-heading font-semibold mb-2">
             {tab === 'created' ? '还没有创建过投票' : '还没有参与过投票'}
           </div>
-          <div className="text-slate-500 text-sm mb-6">
+          <div className="type-body text-secondary mb-6">
             {tab === 'created' ? '创建一个投票后会在这里展示' : '参与投票后会在这里展示'}
           </div>
           <Link href={tab === 'created' ? '/create' : '/polls'} className="inline-block btn-primary px-8 py-3 rounded-xl text-white font-semibold">
@@ -164,13 +164,13 @@ export default function MyPollsPage() {
         <div className="grid gap-4">
           {polls.map((poll) => (
             <div key={poll.id} className="card p-6">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="min-w-0">
-                  <div className="text-lg font-semibold text-slate-800 truncate">{poll.title}</div>
+                  <div className="text-lg font-semibold text-heading truncate">{poll.title}</div>
                   {poll.description && (
-                    <div className="text-sm text-slate-500 mt-1 line-clamp-2">{poll.description}</div>
+                    <div className="type-body text-secondary mt-1 line-clamp-2">{poll.description}</div>
                   )}
-                  <div className="text-sm text-slate-400 mt-3 flex flex-wrap items-center gap-3">
+                  <div className="text-sm text-muted mt-3 flex flex-wrap items-center gap-3">
                     <span>参与人数 {poll.totalVotes}</span>
                     <span>·</span>
                     <span>选项 {poll.options.length}</span>
@@ -185,7 +185,7 @@ export default function MyPollsPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2 shrink-0">
+                <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
                   <Link
                     href={`/vote/${poll.id}`}
                     className="btn-primary px-4 py-2 rounded-xl text-sm font-semibold text-white text-center"
@@ -200,7 +200,7 @@ export default function MyPollsPage() {
                   </button>
                   {tab === 'created' && (
                     <button
-                      className="px-4 py-2 rounded-xl text-sm text-red-600 border border-red-200 hover:bg-red-50 transition-colors"
+                      className="px-4 py-2 rounded-xl text-sm action-outline action-outline-danger transition-colors"
                       onClick={() => deletePoll(poll.id)}
                     >
                       删除
@@ -209,15 +209,15 @@ export default function MyPollsPage() {
                 </div>
               </div>
 
-              <div className="mt-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="tag">投票</span>
-                  {poll.multiSelect && <span className="tag bg-blue-50 text-blue-600">多选</span>}
+                  {poll.multiSelect && <span className="tag tag-accent">多选</span>}
                   {Array.isArray(poll.tags) && poll.tags.length > 0 && (
-                    <span className="tag bg-slate-100 text-slate-600">{poll.tags.slice(0, 2).join(' / ')}</span>
+                    <span className="tag tag-neutral">{poll.tags.slice(0, 2).join(' / ')}</span>
                   )}
                 </div>
-                <div className="text-sm text-slate-400">
+                <div className="text-sm text-muted">
                   {tab === 'created' ? '你创建的投票' : '你参与过的投票'}
                 </div>
               </div>

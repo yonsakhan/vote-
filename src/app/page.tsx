@@ -1,77 +1,125 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import AnimatedTitle from '@/components/animated-title';
+import PollCard from '@/components/poll-card';
 import { Poll } from '@/lib/types';
 
 export default function HomePage() {
   const [polls, setPolls] = useState<Poll[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const stats = useMemo(() => {
+    const totalPolls = polls.length;
+    const totalVotes = polls.reduce((sum, poll) => sum + Number(poll.totalVotes || 0), 0);
+    const activePolls = polls.filter((poll) => !poll.deadline || new Date(poll.deadline) >= new Date()).length;
+
+    return [
+      { label: '当前展示投票', value: String(totalPolls) },
+      { label: '累计参与票数', value: String(totalVotes) },
+      { label: '进行中投票', value: String(activePolls) },
+    ];
+  }, [polls]);
+
   useEffect(() => {
-    fetch('/api/polls')
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => {
+      controller.abort();
+      setLoading(false);
+    }, 4000);
+
+    fetch('/api/polls', { signal: controller.signal })
       .then((res) => res.json())
       .then((data) => {
         setPolls(data.polls || []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => setLoading(false))
+      .finally(() => {
+        window.clearTimeout(timeoutId);
+      });
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(timeoutId);
+    };
   }, []);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <div className="relative">
-          <div className="w-12 h-12 rounded-full border-2 border-blue-100 border-t-blue-600 animate-spin" />
-        </div>
+        <div className="loader-ring" />
       </div>
     );
   }
 
   return (
-    <div>
-      {/* Hero Section */}
-      <div className="text-center py-16 animate-fade-in-up">
-        <h1 className="text-5xl sm:text-6xl font-bold mb-6 text-slate-800 leading-tight">
-          让每一次投票都<span className="gradient-text">简单高效</span>
-        </h1>
-        <p className="text-lg text-slate-500 max-w-2xl mx-auto mb-10">
-          创建实时投票，收集真实反馈，分析数据洞察。适用于团队决策、活动安排、意见收集等多种场景。
-        </p>
+    <div className="space-y-12 lg:space-y-16">
+      <section className="hero-stage relative overflow-hidden rounded-[32px] px-5 py-8 sm:rounded-[40px] sm:px-10 sm:py-14 lg:px-14 lg:py-16">
+        <div className="hero-stage-glow hero-stage-glow-a absolute left-10 top-12 h-32 w-32 rounded-full blur-2xl" />
+        <div className="hero-stage-glow hero-stage-glow-b absolute right-0 top-0 h-64 w-64 rounded-full blur-3xl" />
+        <div className="relative">
+          <div className="space-y-10 animate-fade-in-up">
+            <AnimatedTitle
+              eyebrow="Future-ready polling"
+              title="让决策页面"
+              highlight="像发布会一样闪耀"
+              variant="hero"
+              description="VoteFlow 将在线投票做成更具表现力的交互体验：现代、先锋、带有光感与动势，同时保持创建、分享、参与与回看结果的完整流程。"
+            />
 
-        {/* Stats */}
-        <div className="flex justify-center gap-12 mb-16">
-          <div className="text-center">
-            <div className="text-4xl font-bold gradient-text mb-2">12,580+</div>
-            <div className="text-sm text-slate-500">已创建投票</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold gradient-text mb-2">98,420+</div>
-            <div className="text-sm text-slate-500">参与投票人数</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold gradient-text mb-2">99.9%</div>
-            <div className="text-sm text-slate-500">服务可用性</div>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/create" className="btn-primary rounded-full px-6 py-3 text-sm font-semibold">
+                立即创建投票
+              </Link>
+              <Link href="/polls" className="btn-secondary rounded-full px-6 py-3 text-sm font-semibold">
+                浏览投票列表
+              </Link>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              {stats.map((item) => (
+                <div key={item.label} className="modern-card px-5 py-6">
+                  <div className="micro-label">{item.label}</div>
+                  <div className="mt-3 text-3xl font-semibold hero-title-accent sm:text-4xl">{item.value}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Polls Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold text-slate-800">热门投票</h2>
-          <Link href="/polls" className="text-sm font-medium text-blue-600 hover:text-blue-700">
+      <section className="space-y-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="space-y-3">
+            <span className="neo-badge">Curated polls</span>
+            <div>
+              <h2 className="type-page font-semibold tracking-tight text-heading">
+                当前最值得参与的投票
+              </h2>
+              <p className="mt-3 max-w-2xl type-body text-secondary">
+                首页会展示当前从系统获取到的投票数据。你可以直接进入投票，也可以前往列表页做更细致的搜索、筛选和查看。
+              </p>
+            </div>
+          </div>
+          <Link href="/polls" className="btn-secondary rounded-full px-5 py-2.5 text-sm font-semibold">
             查看全部 →
           </Link>
         </div>
 
         {polls.length === 0 ? (
-          <div className="text-center py-20 animate-fade-in-up">
-            <div className="text-6xl mb-4 opacity-30">📭</div>
-            <p className="text-slate-400 text-lg mb-6">还没有投票</p>
+          <div className="card px-8 py-16 text-center animate-fade-in-up">
+            <div className="hero-cta-icon mx-auto flex h-16 w-16 items-center justify-center rounded-[22px] gradient-bg text-2xl text-white">
+              ✦
+            </div>
+            <p className="mt-6 text-2xl font-semibold text-heading">还没有投票</p>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-secondary">
+              第一个投票将定义这个空间的风格。现在就创建一个主题，把团队、活动或社区的讨论带入更具表现力的界面。
+            </p>
             <Link
               href="/create"
-              className="inline-block btn-primary px-8 py-3 rounded-xl text-white font-semibold"
+              className="mt-8 inline-block btn-primary rounded-full px-8 py-3 text-white font-semibold"
             >
               创建第一个投票
             </Link>
@@ -83,77 +131,7 @@ export default function HomePage() {
             ))}
           </div>
         )}
-      </div>
+      </section>
     </div>
-  );
-}
-
-function PollCard({ poll, index }: { poll: Poll; index: number }) {
-  const isExpired = poll.deadline && new Date(poll.deadline) < new Date();
-  
-  const getRelativeTime = (date: string) => {
-    const now = new Date();
-    const past = new Date(date);
-    const diffMs = now.getTime() - past.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-    
-    if (diffMins < 60) return `${diffMins}分钟前`;
-    if (diffHours < 24) return `${diffHours}小时前`;
-    if (diffDays < 7) return `${diffDays}天前`;
-    return past.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
-  };
-
-  return (
-    <Link
-      href={`/vote/${poll.id}`}
-      className="block card card-hover p-6 animate-fade-in-up"
-      style={{ animationDelay: `${index * 0.1}s` }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-            <span className="text-blue-600">🗳️</span>
-          </div>
-          <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-            isExpired 
-              ? 'bg-slate-100 text-slate-500' 
-              : 'bg-blue-50 text-blue-600'
-          }`}>
-            {isExpired ? '已结束' : '进行中'}
-          </span>
-        </div>
-        <span className="text-xs text-slate-400">
-          {getRelativeTime(poll.createdAt || new Date().toISOString())}
-        </span>
-      </div>
-
-      {/* Title */}
-      <h3 className="text-lg font-semibold text-slate-800 mb-2 line-clamp-2 leading-snug">
-        {poll.title}
-      </h3>
-
-      {/* Description */}
-      {poll.description && (
-        <p className="text-slate-500 text-sm mb-4 line-clamp-2">{poll.description}</p>
-      )}
-
-      {/* Stats */}
-      <div className="flex items-center gap-4 text-sm text-slate-400 mb-4">
-        <span>共有 {poll.totalVotes} 人参与</span>
-        <span>·</span>
-        <span>{poll.options.length} 个选项</span>
-      </div>
-
-      {/* Tags */}
-      <div className="flex items-center gap-2">
-        <span className="tag">投票</span>
-        {poll.multiSelect && (
-          <span className="tag bg-blue-50 text-blue-600">多选</span>
-        )}
-      </div>
-    </Link>
   );
 }

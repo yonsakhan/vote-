@@ -139,82 +139,78 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6">
+    <div className="page-reading-shell">
+      <Link href="/" className="back-link inline-flex items-center gap-2 mb-6">
         <span>←</span>
         <span>返回首页</span>
       </Link>
 
       {!supabaseEnabled ? (
         <div className="card p-10 text-center">
-          <div className="text-slate-800 font-semibold mb-2">创建未配置</div>
-          <div className="text-slate-500 text-sm">请先配置 Supabase 环境变量并完成数据库迁移</div>
+          <div className="text-heading font-semibold mb-2">创建未配置</div>
+          <div className="type-body text-secondary">请先配置 Supabase 环境变量并完成数据库迁移</div>
         </div>
       ) : authChecked && !authed ? (
         <div className="card p-10 text-center">
           <div className="text-3xl mb-4">🔐</div>
-          <div className="text-slate-800 font-semibold text-lg mb-2">创建投票需要登录</div>
-          <div className="text-slate-500 text-sm mb-6">登录后即可创建并在“我的投票”中管理</div>
+          <h2 className="type-section text-heading font-semibold mb-2">创建投票需要登录</h2>
+          <div className="type-body text-secondary mb-6">登录后即可创建并在“我的投票”中管理</div>
           <Link href="/login?next=%2Fcreate" className="inline-block btn-primary px-8 py-3 rounded-xl text-white font-semibold">
             去登录
           </Link>
         </div>
       ) : !authChecked ? (
         <div className="flex items-center justify-center py-24">
-          <div className="w-12 h-12 rounded-full border-2 border-blue-100 border-t-blue-600 animate-spin" />
+          <div className="loader-ring" />
         </div>
       ) : (
-        <div className="flex gap-8">
-        {/* Main Form */}
-        <div className="flex-1">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start">
+        <div className="min-w-0">
           <div className="card p-8">
-            <h1 className="text-3xl font-bold text-slate-800 mb-8">创建新投票</h1>
+            <h1 className="type-page font-bold text-heading mb-8">创建新投票</h1>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">投票标题</label>
+                <label className="field-label block mb-2">投票标题</label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
                   placeholder="请输入投票标题"
-                  className="w-full px-4 py-3 rounded-xl input-field text-slate-800"
+                  className="w-full px-4 py-3 rounded-xl input-field"
                 />
               </div>
 
-              {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">投票描述</label>
+                <label className="field-label block mb-2">投票描述</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
                   placeholder="请输入投票描述（可选）"
-                  className="w-full px-4 py-3 rounded-xl input-field text-slate-800 resize-none"
+                  className="w-full px-4 py-3 rounded-xl input-field resize-none"
                 />
               </div>
 
-              {/* Options */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-3">投票选项</label>
+                <label className="field-label block mb-3">投票选项</label>
                 <div className="space-y-3">
                   {options.map((opt, i) => (
-                    <div key={i} className="flex gap-3 items-center">
-                      <span className="text-sm font-medium text-slate-400 w-6">{i + 1}.</span>
+                    <div key={i} className="flex items-center gap-3">
+                      <span className="field-index">{i + 1}.</span>
                       <input
                         type="text"
                         value={opt}
                         onChange={(e) => updateOption(i, e.target.value)}
                         placeholder={`选项 ${i + 1}`}
-                        className="flex-1 px-4 py-3 rounded-xl input-field text-slate-800"
+                        className="flex-1 px-4 py-3 rounded-xl input-field"
                       />
                       {options.length > 2 && (
                         <button
                           type="button"
                           onClick={() => removeOption(i)}
-                          className="p-2 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                          className="action-outline action-outline-danger rounded-lg p-2 transition-all"
                         >
                           ×
                         </button>
@@ -225,62 +221,58 @@ export default function CreatePage() {
                 <button
                   type="button"
                   onClick={addOption}
-                  className="mt-4 w-full py-3 rounded-xl border-2 border-dashed border-blue-200 text-blue-600 font-medium hover:bg-blue-50 transition-colors"
+                  className="mt-4 w-full py-3 rounded-xl border-2 border-dashed action-outline action-outline-accent font-medium transition-colors"
                 >
                   + 添加选项
                 </button>
               </div>
 
-              {/* Settings */}
-              <div className="pt-4 border-t border-slate-100">
-                <label className="block text-sm font-medium text-slate-700 mb-4">投票设置</label>
+              <div className="pt-4 border-t border-divider">
+                <label className="field-label block mb-4">投票设置</label>
                 
                 <div className="space-y-4">
-                  {/* Multi Select Toggle */}
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50">
-                    <span className="text-slate-700">允许多选</span>
+                  <div className="flex items-center justify-between gap-4 p-4 rounded-xl surface-subtle">
+                    <span className="text-body">允许多选</span>
                     <button
                       type="button"
                       onClick={() => setMultiSelect(!multiSelect)}
                       className={`relative w-12 h-7 rounded-full transition-colors ${
-                        multiSelect ? 'gradient-bg' : 'bg-slate-300'
+                        multiSelect ? 'gradient-bg' : 'toggle-track-off'
                       }`}
                     >
                       <span
-                        className={`absolute top-1 w-5 h-5 rounded-full bg-white shadow-md transition-all ${
+                        className={`absolute top-1 w-5 h-5 rounded-full toggle-thumb transition-all ${
                           multiSelect ? 'left-6' : 'left-1'
                         }`}
                       />
                     </button>
                   </div>
 
-                  {/* Anonymous Toggle */}
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50">
-                    <span className="text-slate-700">匿名投票</span>
+                  <div className="flex items-center justify-between gap-4 p-4 rounded-xl surface-subtle">
+                    <span className="text-body">匿名投票</span>
                     <button
                       type="button"
                       onClick={() => setAnonymous(!anonymous)}
                       className={`relative w-12 h-7 rounded-full transition-colors ${
-                        anonymous ? 'gradient-bg' : 'bg-slate-300'
+                        anonymous ? 'gradient-bg' : 'toggle-track-off'
                       }`}
                     >
                       <span
-                        className={`absolute top-1 w-5 h-5 rounded-full bg-white shadow-md transition-all ${
+                        className={`absolute top-1 w-5 h-5 rounded-full toggle-thumb transition-all ${
                           anonymous ? 'left-6' : 'left-1'
                         }`}
                       />
                     </button>
                   </div>
 
-                  {/* Deadline */}
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50">
-                    <span className="text-slate-700">截止时间</span>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-slate-500">{deadlineLabel}</span>
+                  <div className="flex flex-col gap-3 rounded-xl surface-subtle p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-body">截止时间</span>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      <span className="type-body text-secondary">{deadlineLabel}</span>
                       <select
                         value={deadlineMode}
                         onChange={(e) => applyDeadlineMode(e.target.value as typeof deadlineMode)}
-                        className="px-3 py-2 rounded-lg input-field text-slate-700 text-sm"
+                        className="px-3 py-2 rounded-lg input-field text-sm"
                       >
                         <option value="none">不设置</option>
                         <option value="1d">1天后</option>
@@ -292,8 +284,8 @@ export default function CreatePage() {
                   </div>
 
                   {deadlineMode === 'custom' && (
-                    <div className="p-4 rounded-xl bg-slate-50">
-                      <label className="block text-sm font-medium text-slate-700 mb-2">自定义截止时间</label>
+                    <div className="p-4 rounded-xl surface-subtle">
+                      <label className="field-label block mb-2">自定义截止时间</label>
                       <input
                         type="datetime-local"
                         value={customDeadlineLocal}
@@ -302,19 +294,16 @@ export default function CreatePage() {
                           setCustomDeadlineLocal(v);
                           setDeadline(v ? new Date(v).toISOString() : '');
                         }}
-                        className="w-full px-4 py-3 rounded-xl input-field text-slate-800"
+                        className="w-full px-4 py-3 rounded-xl input-field"
                       />
                     </div>
                   )}
                 </div>
               </div>
 
-              {error && (
-                <div className="p-4 rounded-xl bg-red-50 text-red-600 text-sm">{error}</div>
-              )}
+              {error && <div className="alert-panel alert-panel-error">{error}</div>}
 
-              {/* Buttons */}
-              <div className="flex gap-4 pt-4">
+              <div className="flex flex-col gap-4 pt-4 sm:flex-row">
                 <Link
                   href="/"
                   className="px-8 py-3 rounded-xl btn-secondary text-center"
@@ -328,7 +317,7 @@ export default function CreatePage() {
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
-                      <span className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                      <span className="inline-loader" />
                       创建中...
                     </span>
                   ) : (
@@ -340,22 +329,21 @@ export default function CreatePage() {
           </div>
         </div>
 
-        {/* Tips Sidebar */}
-        <div className="w-80">
-          <div className="card p-6 sticky top-24">
-            <h3 className="text-lg font-semibold text-slate-800 mb-4">💡 创建建议</h3>
+        <div className="min-w-0 xl:w-80">
+          <div className="card p-6 xl:sticky xl:top-24">
+            <h3 className="type-section text-heading font-semibold mb-4">💡 创建建议</h3>
             <div className="space-y-4">
               <div>
-                <div className="font-medium text-slate-700 mb-1">1. 标题要简洁明了</div>
-                <p className="text-sm text-slate-500">让参与者一眼就能明白投票的主题</p>
+                <div className="font-medium text-body mb-1">1. 标题要简洁明了</div>
+                <p className="type-body text-secondary">让参与者一眼就能明白投票的主题</p>
               </div>
               <div>
-                <div className="font-medium text-slate-700 mb-1">2. 选项要全面且互斥</div>
-                <p className="text-sm text-slate-500">确保选项覆盖主要可能性且不重叠</p>
+                <div className="font-medium text-body mb-1">2. 选项要全面且互斥</div>
+                <p className="type-body text-secondary">确保选项覆盖主要可能性且不重叠</p>
               </div>
               <div>
-                <div className="font-medium text-slate-700 mb-1">3. 设置合理的截止时间</div>
-                <p className="text-sm text-slate-500">给参与者充足的时间进行投票</p>
+                <div className="font-medium text-body mb-1">3. 设置合理的截止时间</div>
+                <p className="type-body text-secondary">给参与者充足的时间进行投票</p>
               </div>
             </div>
           </div>

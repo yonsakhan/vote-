@@ -18,7 +18,7 @@ export default function LoginPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center py-24">
-          <div className="w-12 h-12 rounded-full border-2 border-blue-100 border-t-blue-600 animate-spin" />
+          <div className="loader-ring" />
         </div>
       }
     >
@@ -187,38 +187,38 @@ function LoginInner() {
 
   if (!supabaseEnabled) {
     return (
-      <div className="max-w-lg mx-auto">
+      <div className="page-reading-shell max-w-lg">
         <div className="card p-8 text-center">
-          <div className="text-slate-800 font-semibold mb-2">登录未配置</div>
-          <div className="text-slate-500 text-sm">请先配置 NEXT_PUBLIC_SUPABASE_URL 与 NEXT_PUBLIC_SUPABASE_ANON_KEY（或 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY）</div>
+          <div className="text-heading font-semibold mb-2">登录未配置</div>
+          <div className="type-body text-secondary">请先配置 NEXT_PUBLIC_SUPABASE_URL 与 NEXT_PUBLIC_SUPABASE_ANON_KEY（或 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY）</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-lg mx-auto">
-      <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6">
+    <div className="page-reading-shell max-w-lg">
+      <Link href="/" className="back-link inline-flex items-center gap-2 mb-6">
         <span>←</span>
         <span>返回首页</span>
       </Link>
 
       <div className="card p-8">
-        <h1 className="text-2xl font-bold text-slate-800 mb-2">登录</h1>
-        <p className="text-slate-500 text-sm mb-6">选择登录方式，快速进入投票系统。</p>
+        <h1 className="type-page font-bold text-heading mb-2">登录</h1>
+        <p className="type-body text-secondary mb-6">选择登录方式，快速进入投票系统。</p>
 
         {/* 登录方式切换 */}
-        <div className="flex gap-2 mb-6 p-1 bg-slate-100 rounded-xl">
+        <div className="segmented-control mb-6">
           <button
             type="button"
             onClick={() => {
               setLoginMethod('phone');
               setError('');
             }}
-            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
+            className={`segmented-trigger ${
               loginMethod === 'phone'
-                ? 'bg-white text-slate-800 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'segmented-trigger-active'
+                : ''
             }`}
           >
             手机号登录
@@ -229,27 +229,25 @@ function LoginInner() {
               setLoginMethod('email');
               setError('');
             }}
-            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
+            className={`segmented-trigger ${
               loginMethod === 'email'
-                ? 'bg-white text-slate-800 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'segmented-trigger-active'
+                : ''
             }`}
           >
             邮箱登录
           </button>
         </div>
 
-        {error && (
-          <div className="mb-4 p-4 rounded-xl bg-red-50 text-red-600 text-sm">{error}</div>
-        )}
+        {error && <div className="mb-4 alert-panel alert-panel-error">{error}</div>}
 
         {/* 手机号登录表单 */}
         {loginMethod === 'phone' && (
           <form onSubmit={verifyPhoneCode} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">手机号码</label>
-              <div className="flex gap-2">
-                <span className="flex items-center px-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-600 text-sm">
+              <label className="field-label block mb-1">手机号码</label>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <span className="inline-prefix rounded-xl">
                   +86
                 </span>
                 <input
@@ -258,22 +256,22 @@ function LoginInner() {
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="13800138000"
                   maxLength={11}
-                  className="flex-1 px-4 py-3 rounded-xl input-field text-slate-800"
+                  className="flex-1 px-4 py-3 rounded-xl input-field"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">验证码</label>
-              <div className="flex gap-2">
+              <label className="field-label block mb-1">验证码</label>
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <input
                   type="text"
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="6位验证码"
                   maxLength={6}
-                  className="flex-1 px-4 py-3 rounded-xl input-field text-slate-800"
+                  className="flex-1 px-4 py-3 rounded-xl input-field"
                   required
                 />
                 <button
@@ -294,7 +292,7 @@ function LoginInner() {
             </div>
 
             {codeSent && (
-              <div className="p-4 rounded-xl bg-blue-50 text-blue-700 text-sm">
+              <div className="alert-panel alert-panel-info">
                 验证码已发送，请注意查收短信
               </div>
             )}
@@ -313,19 +311,19 @@ function LoginInner() {
         {loginMethod === 'email' && (
           <form onSubmit={sendMagicLink} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">邮箱地址</label>
+              <label className="field-label block mb-1">邮箱地址</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full px-4 py-3 rounded-xl input-field text-slate-800"
+                className="w-full px-4 py-3 rounded-xl input-field"
                 required
               />
             </div>
 
             {emailSent && (
-              <div className="p-4 rounded-xl bg-blue-50 text-blue-700 text-sm">
+              <div className="alert-panel alert-panel-info">
                 已发送登录链接，请检查邮箱（也可能在垃圾箱）。
               </div>
             )}
@@ -340,7 +338,7 @@ function LoginInner() {
           </form>
         )}
 
-        <div className="mt-6 text-xs text-slate-400 leading-relaxed">
+        <div className="mt-6 type-caption text-muted leading-relaxed">
           登录后可创建投票；未登录也可以浏览投票列表与参与投票（投票记录仅对已登录用户展示）。
         </div>
       </div>

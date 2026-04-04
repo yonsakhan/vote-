@@ -20,6 +20,39 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Local Create Flow Test
+
+Start the dev server in one terminal:
+
+```bash
+npm run dev
+```
+
+Run the local create-flow verification in another terminal:
+
+```bash
+npm run test:create:local
+```
+
+The test script will:
+
+- load variables from `.env.local`
+- create or reset a local test user in Supabase
+- sign in with email/password through Supabase Auth
+- call `POST /api/polls`
+- verify the created poll has at least two options
+- delete the test poll by default after verification
+
+Optional environment variables:
+
+```bash
+LOCAL_TEST_BASE_URL=http://localhost:3000
+LOCAL_TEST_USER_EMAIL=local-create-flow@example.com
+LOCAL_TEST_KEEP_DATA=1
+```
+
+Set `LOCAL_TEST_KEEP_DATA=1` if you want to keep the created poll for manual UI inspection after the script finishes.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

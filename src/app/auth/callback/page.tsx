@@ -15,7 +15,7 @@ export default function AuthCallbackPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center py-24">
-          <div className="w-12 h-12 rounded-full border-2 border-blue-100 border-t-blue-600 animate-spin" />
+          <div className="loader-ring" />
         </div>
       }
     >
@@ -146,8 +146,8 @@ function AuthCallbackInner() {
     return (
       <div className="max-w-lg mx-auto">
         <div className="card p-8 text-center">
-          <div className="text-slate-800 font-semibold mb-2">登录未配置</div>
-          <div className="text-slate-500 text-sm">请先配置 NEXT_PUBLIC_SUPABASE_URL 与 NEXT_PUBLIC_SUPABASE_ANON_KEY（或 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY）</div>
+          <h1 className="text-heading font-semibold mb-2">登录未配置</h1>
+          <div className="text-secondary text-sm">请先配置 NEXT_PUBLIC_SUPABASE_URL 与 NEXT_PUBLIC_SUPABASE_ANON_KEY（或 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY）</div>
         </div>
       </div>
     );
@@ -157,8 +157,8 @@ function AuthCallbackInner() {
     return (
       <div className="max-w-lg mx-auto">
         <div className="card p-8 text-center">
-          <div className="text-slate-800 font-semibold mb-2">登录失败</div>
-          <div className="text-slate-500 text-sm mb-4">{error}</div>
+          <h1 className="text-heading font-semibold mb-2">登录失败</h1>
+          <div className="text-secondary text-sm mb-4">{error}</div>
           <button 
             onClick={() => router.push('/login')}
             className="px-4 py-2 rounded-xl btn-primary text-white text-sm"
@@ -172,9 +172,14 @@ function AuthCallbackInner() {
 
   if (processing) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-12 h-12 rounded-full border-2 border-blue-100 border-t-blue-600 animate-spin" />
-        <p className="text-slate-500 text-sm">正在处理登录...</p>
+      <div className="max-w-lg mx-auto">
+        <div className="card p-8 text-center">
+          <div className="mx-auto mb-4 flex w-fit items-center justify-center">
+            <div className="loader-ring loader-ring-sm" />
+          </div>
+          <h1 className="text-heading font-semibold mb-2">正在处理登录</h1>
+          <p className="text-secondary text-sm">正在同步授权会话，请稍候…</p>
+        </div>
       </div>
     );
   }

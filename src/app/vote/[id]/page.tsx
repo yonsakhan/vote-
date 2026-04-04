@@ -93,7 +93,7 @@ export default function VotePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-12 h-12 rounded-full border-2 border-blue-100 border-t-blue-600 animate-spin" />
+        <div className="loader-ring" />
       </div>
     );
   }
@@ -101,9 +101,9 @@ export default function VotePage() {
   if (!poll) {
     return (
       <div className="text-center py-20">
-        <h1 className="text-2xl font-bold mb-2 text-slate-800">投票不存在</h1>
-        <p className="text-slate-500 mb-4">可能已被删除或链接无效</p>
-        <Link href="/" className="text-blue-600 hover:underline">返回首页</Link>
+        <h1 className="text-2xl font-bold mb-2 text-heading">投票不存在</h1>
+        <p className="text-secondary mb-4">可能已被删除或链接无效</p>
+        <Link href="/" className="text-link hover:underline">返回首页</Link>
       </div>
     );
   }
@@ -116,36 +116,36 @@ export default function VotePage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6">
+    <div className="page-shell">
+      <Link href="/" className="back-link inline-flex items-center gap-2 mb-6">
         <span>←</span>
         <span>返回首页</span>
       </Link>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_360px] items-start">
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(280px,332px)]">
         <div className="card p-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+              <div className="icon-shell">
                 <span className="text-xl">🗳️</span>
               </div>
-              <span className="text-sm font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-600">
+              <span className="status-chip">
                 进行中
               </span>
             </div>
-            <span className="text-sm text-slate-400">
+            <span className="text-sm text-muted">
               创建于 {new Date(poll.createdAt || Date.now()).toLocaleDateString('zh-CN')}
             </span>
           </div>
 
-          <h1 className="text-2xl font-bold text-slate-800 mb-3">{poll.title}</h1>
+          <h1 className="type-page font-bold text-heading mb-3">{poll.title}</h1>
           {poll.description && (
-            <p className="text-slate-500 mb-6">{poll.description}</p>
+            <p className="type-body text-secondary mb-6">{poll.description}</p>
           )}
 
-          <div className="flex flex-wrap items-center gap-3 mb-6 text-sm text-slate-400">
+          <div className="flex flex-wrap items-center gap-3 mb-6 text-sm text-muted">
             {poll.multiSelect && (
-              <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-medium">
+              <span className="status-chip">
                 多选
               </span>
             )}
@@ -163,39 +163,39 @@ export default function VotePage() {
                 <button
                   key={option.id}
                   onClick={() => toggleOption(option.id)}
-                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                  className={`choice-card ${
                     selected.includes(option.id)
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-slate-200 hover:border-blue-300 bg-slate-50'
+                      ? 'choice-card-active'
+                      : ''
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                      className={`choice-dot ${
                         selected.includes(option.id)
-                          ? 'border-blue-500 bg-blue-500'
-                          : 'border-slate-300 bg-white'
+                          ? 'choice-dot-active'
+                          : ''
                       }`}
                     >
                       {selected.includes(option.id) && (
                         <span className="text-white text-xs">✓</span>
                       )}
                     </div>
-                    <span className={selected.includes(option.id) ? 'text-blue-700 font-medium' : 'text-slate-700'}>
+                    <span className={selected.includes(option.id) ? 'text-accent font-medium' : 'text-body'}>
                       {option.text}
                     </span>
                   </div>
                 </button>
               ))
             ) : (
-              <div className="p-4 rounded-xl bg-amber-50 text-amber-700 text-sm">
+              <div className="alert-panel alert-panel-warning">
                 该投票数据不完整，暂时无法参与投票，请稍后刷新或重新创建。
               </div>
             )}
           </div>
 
           {error && (
-            <div className="p-4 rounded-xl bg-red-50 text-red-600 text-sm mb-4">{error}</div>
+            <div className="alert-panel alert-panel-error mb-4">{error}</div>
           )}
 
           <button
@@ -205,7 +205,7 @@ export default function VotePage() {
           >
             {submitting ? (
               <span className="flex items-center justify-center gap-2">
-                <span className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                <span className="inline-loader" />
                 提交中...
               </span>
             ) : (
@@ -216,18 +216,16 @@ export default function VotePage() {
 
         <div className="grid gap-4">
           <div className="card p-6">
-            <h3 className="font-semibold text-slate-800 mb-4">最近参与者</h3>
+            <h3 className="type-section font-semibold text-heading mb-4">最近参与者</h3>
             <div className="space-y-3">
               {['张三', '李四', '王五'].map((name, i) => (
                 <div key={i} className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
-                    ['bg-red-100 text-red-600', 'bg-green-100 text-green-600', 'bg-blue-100 text-blue-600'][i]
-                  }`}>
+                  <div className={`${['result-avatar-1', 'result-avatar-2', 'result-avatar-3'][i]} text-sm`}>
                     {name[0]}
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-slate-800">{name}</div>
-                    <div className="text-xs text-slate-400">{['2分钟前', '15分钟前', '1小时前'][i]}</div>
+                    <div className="font-medium text-heading">{name}</div>
+                    <div className="type-caption text-muted">{['2分钟前', '15分钟前', '1小时前'][i]}</div>
                   </div>
                 </div>
               ))}
@@ -235,15 +233,15 @@ export default function VotePage() {
           </div>
 
           <div className="card p-6">
-            <h3 className="font-semibold text-slate-800 mb-4">相关投票</h3>
+            <h3 className="type-section font-semibold text-heading mb-4">相关投票</h3>
             <div className="space-y-3">
-              <div className="p-3 rounded-lg bg-slate-50">
-                <div className="text-sm font-medium text-slate-700">你最常用的前端框架？</div>
-                <div className="text-xs text-slate-400 mt-1">234 人参与</div>
+              <div className="p-3 rounded-lg surface-subtle">
+                <div className="font-medium text-body">你最常用的前端框架？</div>
+                <div className="type-caption text-muted mt-1">234 人参与</div>
               </div>
-              <div className="p-3 rounded-lg bg-slate-50">
-                <div className="text-sm font-medium text-slate-700">你最喜欢的代码编辑器？</div>
-                <div className="text-xs text-slate-400 mt-1">189 人参与</div>
+              <div className="p-3 rounded-lg surface-subtle">
+                <div className="font-medium text-body">你最喜欢的代码编辑器？</div>
+                <div className="type-caption text-muted mt-1">189 人参与</div>
               </div>
             </div>
           </div>
@@ -263,34 +261,34 @@ function ResultView({ poll, isExpired, id }: { poll: Poll; isExpired: boolean; i
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6">
+    <div className="page-shell">
+      <Link href="/" className="back-link inline-flex items-center gap-2 mb-6">
         <span>←</span>
         <span>返回首页</span>
       </Link>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_360px] items-start">
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(280px,332px)]">
         <div className="card p-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+              <div className="icon-shell">
                 <span className="text-xl">🗳️</span>
               </div>
               <span className={`text-sm font-medium px-3 py-1 rounded-full ${
                 isExpired
-                  ? 'bg-slate-100 text-slate-500'
-                  : 'bg-blue-50 text-blue-600'
+                  ? 'status-chip status-chip-muted'
+                  : 'status-chip'
               }`}>
                 {isExpired ? '已结束' : '进行中'}
               </span>
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-slate-800 mb-2">{poll.title}</h1>
+          <h1 className="type-page font-bold text-heading mb-2">{poll.title}</h1>
           {poll.description && (
-            <p className="text-slate-500 mb-4">{poll.description}</p>
+            <p className="type-body text-secondary mb-4">{poll.description}</p>
           )}
-          <p className="text-sm text-slate-400 mb-6">共 {poll.totalVotes} 人投票</p>
+          <p className="type-body text-muted mb-6">共 {poll.totalVotes} 人投票</p>
 
           <div className="space-y-4 mb-6">
             {poll.options
@@ -302,14 +300,14 @@ function ResultView({ poll, isExpired, id }: { poll: Poll; isExpired: boolean; i
                 return (
                   <div key={option.id}>
                     <div className="flex justify-between text-sm mb-2">
-                      <span className={isMax ? 'font-semibold text-slate-800' : 'text-slate-600'}>
+                      <span className={isMax ? 'font-semibold text-heading' : 'text-secondary'}>
                         {option.text}
                       </span>
-                      <span className="text-slate-500">
+                      <span className="text-secondary">
                         {option.votes} 票 ({pct.toFixed(1)}%)
                       </span>
                     </div>
-                    <div className="h-3 rounded-full bg-slate-100 overflow-hidden">
+                    <div className="h-3 rounded-full result-track overflow-hidden">
                       <div
                         className="h-full rounded-full progress-fill"
                         style={{ width: `${pct}%` }}
@@ -320,16 +318,16 @@ function ResultView({ poll, isExpired, id }: { poll: Poll; isExpired: boolean; i
               })}
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button
               onClick={copyLink}
-              className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors"
+                className="flex-1 py-3 rounded-xl action-outline font-medium transition-colors"
             >
               复制链接
             </button>
             <Link
               href="/"
-              className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors text-center"
+                className="flex-1 py-3 rounded-xl action-outline font-medium transition-colors text-center"
             >
               返回首页
             </Link>
@@ -338,18 +336,16 @@ function ResultView({ poll, isExpired, id }: { poll: Poll; isExpired: boolean; i
 
         <div className="grid gap-4">
           <div className="card p-6">
-            <h3 className="font-semibold text-slate-800 mb-4">最近参与者</h3>
+            <h3 className="type-section font-semibold text-heading mb-4">最近参与者</h3>
             <div className="space-y-3">
               {['张三', '李四', '王五'].map((name, i) => (
                 <div key={i} className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
-                    ['bg-red-100 text-red-600', 'bg-green-100 text-green-600', 'bg-blue-100 text-blue-600'][i]
-                  }`}>
+                  <div className={`${['result-avatar-1', 'result-avatar-2', 'result-avatar-3'][i]} text-sm`}>
                     {name[0]}
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-slate-800">{name}</div>
-                    <div className="text-xs text-slate-400">{['2分钟前', '15分钟前', '1小时前'][i]}</div>
+                    <div className="font-medium text-heading">{name}</div>
+                    <div className="type-caption text-muted">{['2分钟前', '15分钟前', '1小时前'][i]}</div>
                   </div>
                 </div>
               ))}
@@ -357,15 +353,15 @@ function ResultView({ poll, isExpired, id }: { poll: Poll; isExpired: boolean; i
           </div>
 
           <div className="card p-6">
-            <h3 className="font-semibold text-slate-800 mb-4">相关投票</h3>
+            <h3 className="type-section font-semibold text-heading mb-4">相关投票</h3>
             <div className="space-y-3">
-              <div className="p-3 rounded-lg bg-slate-50">
-                <div className="text-sm font-medium text-slate-700">你最常用的前端框架？</div>
-                <div className="text-xs text-slate-400 mt-1">234 人参与</div>
+              <div className="p-3 rounded-lg surface-subtle">
+                <div className="font-medium text-body">你最常用的前端框架？</div>
+                <div className="type-caption text-muted mt-1">234 人参与</div>
               </div>
-              <div className="p-3 rounded-lg bg-slate-50">
-                <div className="text-sm font-medium text-slate-700">你最喜欢的代码编辑器？</div>
-                <div className="text-xs text-slate-400 mt-1">189 人参与</div>
+              <div className="p-3 rounded-lg surface-subtle">
+                <div className="font-medium text-body">你最喜欢的代码编辑器？</div>
+                <div className="type-caption text-muted mt-1">189 人参与</div>
               </div>
             </div>
           </div>

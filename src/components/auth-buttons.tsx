@@ -40,7 +40,7 @@ export default function AuthButtons() {
     return (
       <Link
         href="/login"
-        className="btn-secondary px-4 py-2.5 rounded-xl text-sm font-semibold"
+        className="site-auth-login btn-secondary rounded-full px-4 py-2.5 text-sm font-semibold"
       >
         登录
       </Link>
@@ -48,13 +48,13 @@ export default function AuthButtons() {
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="px-3 py-2 rounded-xl bg-blue-50 border border-blue-100 text-sm font-semibold text-blue-700 max-w-[180px] truncate">
+    <div className="site-auth flex flex-wrap items-center gap-3">
+      <div className="site-auth-user user-chip max-w-[180px] truncate px-4 py-2.5 text-sm font-semibold">
         {email}
       </div>
       <button
         onClick={logout}
-        className="btn-secondary px-4 py-2.5 rounded-xl text-sm font-semibold"
+        className="site-auth-login btn-secondary rounded-full px-4 py-2.5 text-sm font-semibold"
       >
         退出
       </button>

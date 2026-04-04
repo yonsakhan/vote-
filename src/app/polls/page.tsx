@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import AnimatedTitle from '@/components/animated-title';
+import PollCard from '@/components/poll-card';
 import { Poll } from '@/lib/types';
 import { getSupabaseBrowser } from '@/lib/supabase-browser';
 
@@ -15,7 +17,7 @@ export default function PollsPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center py-24">
-          <div className="w-12 h-12 rounded-full border-2 border-blue-100 border-t-blue-600 animate-spin" />
+          <div className="loader-ring" />
         </div>
       }
     >
@@ -198,28 +200,33 @@ function PollsInner() {
     <div className="grid gap-6">
       <div className="card p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800">投票列表</h1>
-            <div className="text-sm text-slate-500 mt-1">搜索、筛选并参与投票</div>
+          <div className="max-w-2xl">
+            <AnimatedTitle
+              eyebrow="Discover active discussions"
+              title="投票列表"
+              highlight="筛选、搜索、立即参与"
+              variant="page"
+              description="浏览所有投票，按状态、热度与范围快速切换，找到最值得加入的讨论。"
+            />
           </div>
-          <Link href="/create" className="btn-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center">
+          <Link href="/create" className="btn-primary rounded-full px-5 py-2.5 text-sm font-semibold text-white text-center">
             + 创建投票
           </Link>
         </div>
 
-        <div className="mt-5 grid gap-3 md:grid-cols-[1fr_140px_140px]">
+        <div className="mt-5 grid gap-3 xl:grid-cols-[minmax(0,1fr)_168px_168px]">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               applySearch();
             }}
-            className="flex gap-3"
+            className="flex flex-col gap-3 sm:flex-row"
           >
             <input
               value={qInput}
               onChange={(e) => setQInput(e.target.value)}
               placeholder="搜索投票标题/描述"
-              className="w-full px-4 py-3 rounded-xl input-field text-slate-800"
+              className="w-full px-4 py-3 rounded-xl input-field"
             />
             <button type="submit" className="btn-secondary px-4 py-3 rounded-xl text-sm">
               搜索
@@ -229,7 +236,7 @@ function PollsInner() {
           <select
             value={status}
             onChange={(e) => updateStatus(e.target.value as StatusFilter)}
-            className="px-4 py-3 rounded-xl input-field text-slate-700 text-sm"
+            className="px-4 py-3 rounded-xl input-field text-sm"
           >
             <option value="all">全部状态</option>
             <option value="ongoing">进行中</option>
@@ -239,18 +246,18 @@ function PollsInner() {
           <select
             value={sort}
             onChange={(e) => updateSort(e.target.value as SortKey)}
-            className="px-4 py-3 rounded-xl input-field text-slate-700 text-sm"
+            className="px-4 py-3 rounded-xl input-field text-sm"
           >
             <option value="new">最新创建</option>
             <option value="hot">最热投票</option>
           </select>
         </div>
 
-        <div className="mt-3 grid gap-3 md:grid-cols-[180px_1fr_120px]">
+        <div className="mt-3 grid gap-3 xl:grid-cols-[200px_minmax(0,1fr)_132px]">
           <select
             value={scope}
             onChange={(e) => updateScope(e.target.value as ScopeKey)}
-            className="px-4 py-3 rounded-xl input-field text-slate-700 text-sm"
+            className="px-4 py-3 rounded-xl input-field text-sm"
           >
             <option value="all">全部投票</option>
             <option value="mine">我创建的</option>
@@ -261,7 +268,7 @@ function PollsInner() {
             value={tagsInput}
             onChange={(e) => setTagsInput(e.target.value)}
             placeholder="标签筛选（逗号分隔，例如：产品,技术）"
-            className="w-full px-4 py-3 rounded-xl input-field text-slate-800"
+            className="w-full px-4 py-3 rounded-xl input-field"
           />
 
           <button
@@ -275,10 +282,10 @@ function PollsInner() {
       </div>
 
       {(scope === 'mine' || scope === 'voted') && !userId ? (
-        <div className="card p-10 text-center">
+        <div className="card p-8 text-center sm:p-10">
           <div className="text-3xl mb-3">🔐</div>
-          <div className="text-slate-800 font-semibold mb-2">需要登录</div>
-          <div className="text-slate-500 text-sm mb-6">查看“我创建的 / 我参与的”需要先登录</div>
+          <div className="text-heading font-semibold mb-2">需要登录</div>
+          <div className="text-secondary type-body mb-6">查看“我创建的 / 我参与的”需要先登录</div>
           <Link href={`/login?next=${encodeURIComponent('/polls')}`} className="inline-block btn-primary px-8 py-3 rounded-xl text-white font-semibold">
             去登录
           </Link>
@@ -287,18 +294,18 @@ function PollsInner() {
 
       {loading ? (
         <div className="flex items-center justify-center py-24">
-          <div className="w-12 h-12 rounded-full border-2 border-blue-100 border-t-blue-600 animate-spin" />
+          <div className="loader-ring" />
         </div>
       ) : error ? (
         <div className="card p-8 text-center">
-          <div className="text-slate-800 font-semibold mb-2">加载失败</div>
-          <div className="text-slate-500 text-sm">{error}</div>
+          <div className="text-heading font-semibold mb-2">加载失败</div>
+          <div className="text-secondary type-body">{error}</div>
         </div>
       ) : polls.length === 0 ? (
         <div className="card p-12 text-center">
           <div className="text-6xl mb-4 opacity-30">📭</div>
-          <div className="text-slate-700 font-semibold mb-2">没有找到投票</div>
-          <div className="text-slate-500 text-sm">试试更换关键词或筛选条件</div>
+          <div className="text-heading font-semibold mb-2">没有找到投票</div>
+          <div className="text-secondary type-body">试试更换关键词或筛选条件</div>
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -308,8 +315,8 @@ function PollsInner() {
         </div>
       )}
 
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-slate-500">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="type-body text-secondary">
           共 {total} 条 · 第 {page} / {totalPages} 页
         </div>
         <div className="flex gap-3">
@@ -330,70 +337,5 @@ function PollsInner() {
         </div>
       </div>
     </div>
-  );
-}
-
-function PollCard({ poll, index }: { poll: Poll; index: number }) {
-  const isExpired = poll.deadline && new Date(poll.deadline) < new Date();
-
-  const getRelativeTime = (date: string) => {
-    const now = new Date();
-    const past = new Date(date);
-    const diffMs = now.getTime() - past.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 60) return `${diffMins}分钟前`;
-    if (diffHours < 24) return `${diffHours}小时前`;
-    if (diffDays < 7) return `${diffDays}天前`;
-    return past.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
-  };
-
-  return (
-    <Link
-      href={`/vote/${poll.id}`}
-      className="block card card-hover p-6 animate-fade-in-up"
-      style={{ animationDelay: `${Math.min(index, 8) * 0.05}s` }}
-    >
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-            <span className="text-blue-600">🗳️</span>
-          </div>
-          <span
-            className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-              isExpired ? 'bg-slate-100 text-slate-500' : 'bg-blue-50 text-blue-600'
-            }`}
-          >
-            {isExpired ? '已结束' : '进行中'}
-          </span>
-        </div>
-        <span className="text-xs text-slate-400">
-          {getRelativeTime(poll.createdAt || new Date().toISOString())}
-        </span>
-      </div>
-
-      <h3 className="text-lg font-semibold text-slate-800 mb-2 line-clamp-2 leading-snug">
-        {poll.title}
-      </h3>
-
-      {poll.description && (
-        <p className="text-slate-500 text-sm mb-4 line-clamp-2">{poll.description}</p>
-      )}
-
-      <div className="flex items-center gap-4 text-sm text-slate-400 mb-4">
-        <span>共有 {poll.totalVotes} 人参与</span>
-        <span>·</span>
-        <span>{poll.options.length} 个选项</span>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <span className="tag">投票</span>
-        {poll.multiSelect && (
-          <span className="tag bg-blue-50 text-blue-600">多选</span>
-        )}
-      </div>
-    </Link>
   );
 }
